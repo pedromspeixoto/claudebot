@@ -42,3 +42,16 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: ${{ inputs.prompt }}
           claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10"
+          additional_permissions: |
+            Bash(git:*)
+            Bash(gh:*)
+            Bash(ls:*)
+            Bash(cat:*)
+            Bash(find:*)
+            Bash(grep:*)
+            Bash(python:*)
+            Bash(pip:*)
+            Bash(npm:*)
+            Bash(npx:*)
+            Bash(bun:*)
+            Bash(uv:*)

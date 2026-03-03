@@ -49,3 +49,16 @@ jobs:
           prompt: ${{ inputs.prompt }}
           trigger_phrase: ${{ inputs.trigger_phrase }}
           claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 5"
+          additional_permissions: |
+            Bash(git:*)
+            Bash(gh:*)
+            Bash(ls:*)
+            Bash(cat:*)
+            Bash(find:*)
+            Bash(grep:*)
+            Bash(python:*)
+            Bash(pip:*)
+            Bash(npm:*)
+            Bash(npx:*)
+            Bash(bun:*)
+            Bash(uv:*)
