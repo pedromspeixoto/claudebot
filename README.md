@@ -38,6 +38,16 @@ Boilerplate for integrating **Sentry** error monitoring with **Claude** AI-power
 
 Both SDKs initialize only when a DSN is provided.
 
+## Sentry → Claude Pipeline
+
+When a new error is captured by Sentry, it can automatically trigger Claude to analyze and propose a fix:
+
+```
+Sentry error → Pipedream webhook → GitHub Issue created → Claude analyzes & opens fix PR
+```
+
+This uses [Pipedream](https://pipedream.com) (free tier) as a bridge since Sentry's free plan doesn't support automatic GitHub issue creation. See [docs/pipedream-setup.md](docs/pipedream-setup.md) for setup instructions.
+
 ## Claude Workflows
 
 Reusable GitHub Actions workflows that trigger when `@claude` is mentioned:
