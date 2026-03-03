@@ -13,16 +13,6 @@ on:
           1. Add a comment to the issue with your analysis: root cause, affected files, and a suggested fix approach.
           2. If you can identify a fix, create a pull request with the changes.
           Keep your analysis concise and actionable.
-      max_turns:
-        description: 'Maximum number of conversation turns for Claude'
-        required: false
-        type: string
-        default: '10'
-      model:
-        description: 'Claude model to use'
-        required: false
-        type: string
-        default: 'claude-sonnet-4-5-20250929'
     secrets:
       ANTHROPIC_API_KEY:
         description: 'Anthropic API key for Claude'
@@ -32,6 +22,7 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  id-token: write
 
 jobs:
   review-issue:
@@ -50,5 +41,4 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: ${{ inputs.prompt }}
-          max_turns: ${{ inputs.max_turns }}
-          model: ${{ inputs.model }}
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10"

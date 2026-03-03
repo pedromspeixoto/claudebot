@@ -12,16 +12,6 @@ on:
           You are an expert code reviewer. Review this pull request.
           Provide a concise review covering: correctness, potential bugs, security concerns, and suggestions for improvement.
           Be constructive and actionable in your feedback.
-      max_turns:
-        description: 'Maximum number of conversation turns for Claude'
-        required: false
-        type: string
-        default: '5'
-      model:
-        description: 'Claude model to use'
-        required: false
-        type: string
-        default: 'claude-sonnet-4-5-20250929'
       trigger_phrase:
         description: 'Phrase to trigger Claude in comments'
         required: false
@@ -36,6 +26,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  id-token: write
 
 jobs:
   review-pr:
@@ -56,6 +47,5 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: ${{ inputs.prompt }}
-          max_turns: ${{ inputs.max_turns }}
-          model: ${{ inputs.model }}
           trigger_phrase: ${{ inputs.trigger_phrase }}
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 5"

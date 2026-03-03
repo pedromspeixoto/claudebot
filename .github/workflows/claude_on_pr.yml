@@ -9,6 +9,12 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
 jobs:
   claude-pr:
     uses: ./.github/workflows/_claude_pr_reviewer.yml

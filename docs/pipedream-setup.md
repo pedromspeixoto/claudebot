@@ -53,7 +53,64 @@ def handler(pd: "pipedream"):
     platform = event.get("platform", "N/A")
     web_url = event.get("web_url", "")
 
-    body = "\n".join([
+    # --- Extract stack trace ---
+    stacktrace_text = ""
+    # Sentry sends exception data in event.exception.values
+    exception_info = event.get("exception", {})
+    exc_values = exception_info.get("values", [])
+    # Fallback: some payloads nest it under event.entries
+    if not exc_values:
+        for entry in event.get("entries", []):
+            if entry.get("type") == "exception":
+                exc_values = entry.get("data", {}).get("values", [])
+                break
+
+    for exc in exc_values:
+        exc_type = exc.get("type", "Exception")
+        exc_value = exc.get("value", "")
+        frames = exc.get("stacktrace", {}).get("frames", [])
+
+        lines = [f"**{exc_type}: {exc_value}**", "", "```"]
+        for frame in frames:
+            filename = frame.get("filename") or frame.get("abs_path", "?")
+            lineno = frame.get("lineno", "?")
+            func = frame.get("function", "?")
+            lines.append(f"  File \"{filename}\", line {lineno}, in {func}")
+            context_line = frame.get("context_line")
+            if context_line:
+                lines.append(f"    {context_line.strip()}")
+        lines.append("```")
+        stacktrace_text += "\n".join(lines) + "\n"
+
+    # --- Extract request info (if available) ---
+    request_text = ""
+    request_info = event.get("request", {})
+    if not request_info:
+        for entry in event.get("entries", []):
+            if entry.get("type") == "request":
+                request_info = entry.get("data", {})
+                break
+    if request_info:
+        method = request_info.get("method", "")
+        url = request_info.get("url", "")
+        if method and url:
+            request_text = f"**Request**: `{method} {url}`\n"
+
+    # --- Extract tags ---
+    tags_text = ""
+    tags = event.get("tags", [])
+    if tags:
+        tag_items = []
+        for tag in tags:
+            if isinstance(tag, dict):
+                tag_items.append(f"`{tag.get('key', '')}:{tag.get('value', '')}`")
+            elif isinstance(tag, (list, tuple)) and len(tag) >= 2:
+                tag_items.append(f"`{tag[0]}:{tag[1]}`")
+        if tag_items:
+            tags_text = "**Tags**: " + ", ".join(tag_items) + "\n"
+
+    # --- Build issue body ---
+    body_parts = [
         "## Sentry Error",
         "",
         "| Field | Value |",
@@ -67,9 +124,23 @@ def handler(pd: "pipedream"):
         f"| **Event ID** | `{event_id}` |",
         f"| **Sentry Link** | [View in Sentry]({web_url}) |",
         "",
+    ]
+
+    if request_text:
+        body_parts += [request_text, ""]
+
+    if tags_text:
+        body_parts += [tags_text, ""]
+
+    if stacktrace_text:
+        body_parts += ["## Stack Trace", "", stacktrace_text, ""]
+
+    body_parts += [
         "---",
-        "*Automatically created via Sentry + Pipedream integration.*",
-    ])
+        "@claude Analyze this Sentry error. Identify the root cause from the stack trace, find the relevant code in the repository, and create a pull request with a fix.",
+    ]
+
+    body = "\n".join(body_parts)
 
     response = requests.post(
         f"https://api.github.com/repos/{owner}/{repo}/issues",
