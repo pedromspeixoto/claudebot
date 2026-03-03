@@ -5,8 +5,32 @@ This guide explains how to configure the Claude issue reviewer and PR reviewer w
 ## Prerequisites
 
 - An Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
+- The Claude GitHub App installed on your repository
 
-## 1. Add the Repository Secret
+## 1. Install the Claude GitHub App
+
+The `claude-code-action` requires a GitHub App for authentication so it can comment on issues/PRs and create branches.
+
+**Option A: Official Claude GitHub App (recommended)**
+
+1. Go to [github.com/apps/claude](https://github.com/apps/claude)
+2. Click **Install** and select your repository
+3. No additional configuration needed — the action auto-generates a short-lived, repo-scoped token
+4. Comments and commits will appear as `claude[bot]`
+
+**Option B: Custom GitHub App**
+
+If you prefer to use your own GitHub App:
+
+1. Create a GitHub App with the following permissions:
+   - **Contents**: Read & Write
+   - **Pull Requests**: Read & Write
+   - **Issues**: Read & Write
+2. Install the app on your repository
+3. Add `APP_ID` and `APP_PRIVATE_KEY` as repository secrets
+4. Generate a token in your workflow using `actions/create-github-app-token@v1` and pass it as the `github_token` input to the action
+
+## 2. Add the Repository Secret
 
 1. Go to **Settings > Secrets and variables > Actions**
 2. Click **New repository secret**
@@ -16,7 +40,7 @@ This guide explains how to configure the Claude issue reviewer and PR reviewer w
 | ------------------- | ---------------------- |
 | `ANTHROPIC_API_KEY` | Your Anthropic API key |
 
-## 2. Configure Workflow Permissions
+## 3. Configure Workflow Permissions
 
 1. Go to **Settings > Actions > General**
 2. Scroll to **Workflow permissions**
@@ -24,7 +48,7 @@ This guide explains how to configure the Claude issue reviewer and PR reviewer w
 4. Check **"Allow GitHub Actions to create and approve pull requests"**
 5. Click **Save**
 
-## 3. Create Caller Workflows
+## 4. Create Caller Workflows
 
 The reusable workflows (`claude_issue_reviewer.yml` and `claude_pr_reviewer.yml`) need caller workflows to trigger them. Create the following files in your repository:
 
