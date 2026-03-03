@@ -1,0 +1,61 @@
+---
+name: Claude PR Reviewer
+
+on:
+  workflow_call:
+    inputs:
+      prompt:
+        description: 'Custom prompt for Claude when reviewing PRs (used on PR open/sync)'
+        required: false
+        type: string
+        default: |
+          You are an expert code reviewer. Review this pull request.
+          Provide a concise review covering: correctness, potential bugs, security concerns, and suggestions for improvement.
+          Be constructive and actionable in your feedback.
+      max_turns:
+        description: 'Maximum number of conversation turns for Claude'
+        required: false
+        type: string
+        default: '5'
+      model:
+        description: 'Claude model to use'
+        required: false
+        type: string
+        default: 'claude-sonnet-4-5-20250929'
+      trigger_phrase:
+        description: 'Phrase to trigger Claude in comments'
+        required: false
+        type: string
+        default: '@claude'
+    secrets:
+      ANTHROPIC_API_KEY:
+        description: 'Anthropic API key for Claude'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  review-pr:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'pull_request' && (contains(github.event.pull_request.body, '@claude') || contains(github.event.pull_request.title, '@claude')))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude PR Reviewer
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: ${{ inputs.prompt }}
+          max_turns: ${{ inputs.max_turns }}
+          model: ${{ inputs.model }}
+          trigger_phrase: ${{ inputs.trigger_phrase }}
