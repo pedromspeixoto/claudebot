@@ -1,9 +1,8 @@
 name: Claude on PR
+
 on:
   pull_request:
     types: [opened, synchronize]
-  pull_request_review:
-    types: [submitted]
   pull_request_review_comment:
     types: [created]
   issue_comment:
@@ -17,6 +16,17 @@ permissions:
 
 jobs:
   claude-pr:
-    uses: ./.github/workflows/_claude_pr_reviewer.yml
-    secrets:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '@claude'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10"

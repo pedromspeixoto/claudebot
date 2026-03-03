@@ -1,4 +1,5 @@
 name: Claude on Issue
+
 on:
   issues:
     types: [opened, edited]
@@ -13,6 +14,16 @@ permissions:
 
 jobs:
   claude-issue:
-    uses: ./.github/workflows/_claude_issue_reviewer.yml
-    secrets:
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 10"
