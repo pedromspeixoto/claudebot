@@ -50,7 +50,7 @@ If you prefer to use your own GitHub App:
 
 ## 4. Create Caller Workflows
 
-The reusable workflows (`claude_issue_reviewer.yml` and `claude_pr_reviewer.yml`) need caller workflows to trigger them. Create the following files in your repository:
+The reusable workflows (`_claude_issue_reviewer.yml` and `_claude_pr_reviewer.yml`) need caller workflows to trigger them. Create the following files in your repository:
 
 ### Issue Reviewer Caller
 
@@ -66,7 +66,7 @@ on:
 
 jobs:
   claude-issue:
-    uses: ./.github/workflows/claude_issue_reviewer.yml
+    uses: ./.github/workflows/_claude_issue_reviewer.yml
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
@@ -89,7 +89,7 @@ on:
 
 jobs:
   claude-pr:
-    uses: ./.github/workflows/claude_pr_reviewer.yml
+    uses: ./.github/workflows/_claude_pr_reviewer.yml
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
@@ -99,7 +99,7 @@ You can override the default inputs if needed:
 ```yaml
 jobs:
   claude-pr:
-    uses: ./.github/workflows/claude_pr_reviewer.yml
+    uses: ./.github/workflows/_claude_pr_reviewer.yml
     with:
       model: 'claude-sonnet-4-5-20250929'
       max_turns: '10'

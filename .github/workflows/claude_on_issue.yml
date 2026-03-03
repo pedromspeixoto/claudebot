@@ -1,0 +1,12 @@
+name: Claude on Issue
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-issue:
+    uses: ./.github/workflows/_claude_issue_reviewer.yml
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
