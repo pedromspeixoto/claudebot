@@ -26,6 +26,4 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 50"
-          prompt: |
-            Analyze the issue and implement a fix. You MUST always create a pull request with your changes. Never just comment without opening a PR.
+          claude_args: "--model claude-sonnet-4-5-20250929 --max-turns 30"
