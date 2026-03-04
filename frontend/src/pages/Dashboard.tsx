@@ -1,5 +1,3 @@
-import * as Sentry from "@sentry/react";
-import apiClient from "../api/client";
 import type { User } from "../types";
 
 interface Props {
@@ -46,33 +44,6 @@ export default function Dashboard({ user }: Props) {
               </span>
             </dd>
           </div>
-        </div>
-      </section>
-
-      <section className="border border-border rounded-lg p-6">
-        <h2 className="text-xs text-text-muted uppercase tracking-widest mb-5">
-          Sentry Debug
-        </h2>
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              throw new Error("Sentry test error from frontend");
-            }}
-            className="text-xs border border-danger/30 text-danger hover:bg-danger/10 px-4 py-2 rounded transition-colors cursor-pointer"
-          >
-            Trigger Frontend Error
-          </button>
-          <button
-            onClick={() => {
-              apiClient.get("/sentry-debug").catch((err) => {
-                Sentry.captureException(err);
-                alert("Backend error triggered! Check Sentry.");
-              });
-            }}
-            className="text-xs border border-accent/30 text-accent hover:bg-accent-muted px-4 py-2 rounded transition-colors cursor-pointer"
-          >
-            Trigger Backend Error
-          </button>
         </div>
       </section>
     </div>
